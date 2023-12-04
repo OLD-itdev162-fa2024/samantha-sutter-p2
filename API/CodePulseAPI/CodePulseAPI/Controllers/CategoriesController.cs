@@ -4,7 +4,7 @@ using CodePulseAPI.Models.DTO;
 using CodePulseAPI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Identity.Client;
 
 namespace CodePulseAPI.Controllers
 {
@@ -22,7 +22,7 @@ namespace CodePulseAPI.Controllers
 
         public ApplicationDbContext DbContext { get; }
 
-        // 
+        
         [HttpPost]
         public async Task<IActionResult> CreateCategory(CreateCategoryRequestDto request)
         {
@@ -43,7 +43,29 @@ namespace CodePulseAPI.Controllers
                 UrlHandle = category.UrlHandle,
             };
 
-            return Ok(response);        
+            return Ok(response);
+
+        }
+
+        // GET: /api/categories
+        [HttpGet]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await categoryRepository.GetAllAsync();
+
+            // Map Domain model to DTO
+            var response = new List<CategoryDto>();
+
+            foreach (var category in categories)
+            {
+                response.Add(new CategoryDto
+                {
+                    Id = category.Id,
+                    Name = category.Name,
+                    UrlHandle = category.UrlHandle
+                });
+            }
+            return Ok(response);
         }
     }
 }
